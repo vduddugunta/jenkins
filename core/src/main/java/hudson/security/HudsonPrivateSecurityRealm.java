@@ -216,19 +216,11 @@ public class HudsonPrivateSecurityRealm extends AbstractPasswordBasedSecurityRea
     }
 
     @Override
-    protected UserDetails authenticate2(String username, String password) throws AuthenticationException {
-        Details u;
-        try {
-            u = load(username);
-        } catch (UsernameNotFoundException ex) {
-            // Waste time to prevent timing attacks distinguishing existing and non-existing user
-            PASSWORD_ENCODER.matches(password, ENCODED_INVALID_USER_PASSWORD);
-            throw ex;
-        }
-        if (!u.isPasswordCorrect(password)) {
-            throw new BadCredentialsException("Bad credentials");
-        }
-        return u.asUserDetails();
+    protected Details authenticate(String username, String password) throws AuthenticationException {
+        Details u = loadUserByUsername(username);
+        if (!u.isPasswordCorrect(password))
+            throw new BadCredentialsException("Failed to login as "+username);
+        return u;
     }
 
     /**
